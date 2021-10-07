@@ -7,6 +7,7 @@ import numpy as np
 from torch.utils.data import SubsetRandomSampler,DataLoader
 from collections import defaultdict
 from configs.globalConfigs import args as _args
+import pickle
 
 class LSTMEval(GeneralEval):
     def __init__(self,args=_args):
@@ -88,6 +89,8 @@ class LSTMEval(GeneralEval):
             all_f = torch.cat(all_f,dim = 0).view(self.data_set.total_idx,-1)
 
             p,r = [],[]
+            pred = {}
+
             for test_id,pos_ids in self.test_record.items():
                 if len(pos_ids)== 1:
                     # pass case with only diagonal 
@@ -95,9 +98,13 @@ class LSTMEval(GeneralEval):
                 test_t = self.data_set[[test_id]]
                 test_f = torch.mean(torch.stack([self.feature_extractor(t[1].tolist()) for t in test_t.items()],dim=-1),dim=-1).cpu()
                 sims = self.cos(test_f,all_f)
+                pred[test_id] = sims
+
                 sims_sort = sims.argsort(dim = -1,descending=True)
                 _p,_r = self.get_metrics(sims_sort,pos_ids,self.args.topk) #s
                 p.append(_p)
                 r.append(_r)
             print('ave_pre:{}\tave_rec:{}'.format(np.mean(p),np.mean(r)))
+            #pickle.dump(pred,open('./pred_{}'.format(i),'wb'))
+            #pickle.dump(self.test_record,open('./true_{}'.format(i),'wb'))
             torch.autograd.set_grad_enabled(True)

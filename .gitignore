@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+*.tar.gz
+*.csv
+*.npy
+*.out
 # C extensions
 *.so
 

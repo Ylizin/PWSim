@@ -1,28 +1,18 @@
 from gensim.corpora import Dictionary
 import pandas as pd
-from .paths import eda_path,dict_path,pre_embedding_path,embedding_path
+from .paths import tag_path,dict_path,pre_embedding_path,embedding_path
 import numpy as np
 from gensim.models import KeyedVectors
+import pickle
 import torch
 from configs.globalConfigs import embedding_size
 
-def load_texts(path = eda_path):
-    df = pd.read_csv(path)
-    texts = df[['sr','ri','rs','rd','des']]
-    return texts
+def load_texts(path = tag_path):
+    df = pd.read_csv(path,header = None,index_col=0)
+    return df
 
-def _make_dict(texts):
-    t = texts.values.flatten()
-    corp = [s.strip().split() for s in t]
-    di = Dictionary(corp)
-    return di
-
-def init_dict():
-    d = _make_dict(load_texts())
-    return d
-
-def save_dict(d,path = dict_path):
-    d.save(path)
+def load_dict(path = dict_path):
+    return pickle.load(open(dict_path,'rb'))
 
 def load_pre_w2v(path=pre_embedding_path):
     model = KeyedVectors.load_word2vec_format(path,binary=True)
@@ -41,8 +31,8 @@ def init_w2v(di,pre_model = None):
 def save_w2v(w2v):
     torch.save(w2v,embedding_path)
 
-if __name__ == '__main__':
-    d = init_dict()
-    save_dict(d)
+def init():
+    print('init')
+    d = load_dict()
     save_w2v(init_w2v(d,pre_model = load_pre_w2v()))
 

@@ -12,7 +12,7 @@ class LSTM(nn.Module):
         self.droprate = args.dropout
         self.bidirectional = args.bidirectional
         self.dropout = nn.Dropout(self.droprate)
-
+        self.relu = nn.ReLU()
         self.cuda = args.cuda
         self.layers = 1
         self.rnn = nn.LSTM(self.input_size,self.hidden_size,self.layers,bidirectional = args.bidirectional)
@@ -36,6 +36,6 @@ class LSTM(nn.Module):
         cn = cn.view(cn.size()[1],-1)
         hn = self.dropout(hn)
         cn = self.dropout(cn)
-        lstm_output = PackedSequence(self.dropout(lstm_output.data),lstm_output.batch_sizes,lstm_output.sorted_indices,lstm_output.unsorted_indices)# dropout on the .data
+        #lstm_output = PackedSequence(self.dropout(lstm_output.data),lstm_output.batch_sizes,lstm_output.sorted_indices,lstm_output.unsorted_indices)# dropout on the .data
         out_tensor,lengths = pad_packed_sequence(lstm_output,batch_first = True)
-        return (out_tensor,lengths),hn,cn
+        return (self.dropout(out_tensor),lengths),hn,cn
