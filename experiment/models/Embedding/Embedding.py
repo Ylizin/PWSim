@@ -29,7 +29,6 @@ class WordEmbedding(nn.Module):
         if self.cuda:
             self.embedding = self.embedding.cuda()
             self.bn = self.bn.cuda()
-            self.idf = self.idf.cuda()
         
     def save(self):
         torch.save(self.embedding.cpu(),self.pret_embeddings+self.suffix)
@@ -44,11 +43,7 @@ class WordEmbedding(nn.Module):
         # self.idf = nn.Embedding.from_pretrained(idf_v,freeze=True)
     
     def get_idf(self,idx):
-        if len(idx)==0:
-            idx = torch.tensor([1])
-        if self.cuda:
-            idx = idx.cuda()
-        return self.sfm(self.idf(idx))
+        pass
         
     def forward(self,idx):
         """

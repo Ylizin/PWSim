@@ -7,8 +7,8 @@ __pycache__/
 *.csv
 *.npy
 *.out
-# C extensions
 *.so
+*.zip
 
 # Distribution / packaging
 .Python

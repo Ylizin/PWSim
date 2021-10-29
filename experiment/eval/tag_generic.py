@@ -52,7 +52,7 @@ class GeneralEval:
         return torch.sum(pow/_pos).item()
     
     # f1,ndcg
-    def get_metrics(self,sims_sort,pos_ids,topk,threshold = 0.6):
+    def get_metrics(self,sims_sort,pos_ids,topk,threshold = 0.5):
         # pos ids -> [(li,score)]
         
         pos_ids = list(filter(lambda x:x[1]>=threshold,sorted(pos_ids,key = lambda x:x[0],reverse = True)))

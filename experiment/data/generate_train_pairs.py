@@ -20,7 +20,7 @@ def ext_servs(tags):
     t = [lem_sent(tag2explan[t]) if t in tag2explan else '' for t in tags]
     return ' '.join(t)
 
-syn2raw = pickle.load(open('./syn2raw','rb'))
+# syn2raw = pickle.load(open('./syn2raw','rb'))
 tag2explan = pickle.load(open('./explan','rb'))
 tag_di = pickle.load(open('tag_di','rb'))
 tag2servs = pickle.load(open('tag2servs','rb'))

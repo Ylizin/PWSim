@@ -21,6 +21,8 @@ class LSTMEval(GeneralEval):
         self.df_idx = self.data_set.df_idx
         
         self.model_str = "TagLSTMEval"
+        self.use_ext_query = args.use_ext_query
+
         self.init_fe()
         self.init_optim()
         self.init_loss()
@@ -62,10 +64,13 @@ class LSTMEval(GeneralEval):
                 l = l.to(torch.float)
                 text2 = self.data_set[id2]
                 # extract a column of a dataframe
-                # and tolist it  
-                 # use ext texts as raw texts 
-#                 f1 = self.feature_extractor([torch.LongTensor(i) for i in id1])
-                f1 = self.feature_extractor([torch.LongTensor(i) for i in self.query_ext(id1)])
+                if self.use_ext_query:
+                    # query 向量， 使用ext之后的tag作为query
+                    f1 = self.feature_extractor([torch.LongTensor(s) for s in self.query_ext(id1)])    # the query using ext texts as raw text
+                else:
+                    # query 向量， 使用原始的tag作为query
+                    f1 = self.feature_extractor([torch.LongTensor(s) for s in id1])
+
 
                 # f1 = torch.stack([torch.mean(self.emb(torch.LongTensor(i)),dim = 0) for i in id1],dim=0).cuda()
                 f2 = self.feature_extractor(text2.tolist())
@@ -119,7 +124,7 @@ class LSTMEval(GeneralEval):
             print(table)
             res[i]=pd.DataFrame(table).mean().T
             #print('ave_pre:{}\tave_rec:{}'.format(np.mean(p),np.mean(r)))
-            pickle.dump(pred,open('./lstm_pred','wb'))
+            # pickle.dump(pred,open('./lstm_pred','wb'))
             # pickle.dump(self.test_record,open('./true_{}'.format(i),'wb'))
             torch.autograd.set_grad_enabled(True)
         pd.DataFrame(res).T.to_csv('./out/'+self.model_str+str(self.train_test_id)+'.csv')

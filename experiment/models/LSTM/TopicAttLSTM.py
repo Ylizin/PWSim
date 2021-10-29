@@ -15,7 +15,7 @@ class LSTMModule(nn.Module):
         self.embedding = WordEmbedding(suffix)
         self.hidden_size = args.hidden_size
         self.topic_size = args.topic_size
-        self.idf = self.embedding.get_idf
+        # self.idf = self.embedding.get_idf
         self.w = nn.Linear(self.topic_size, 2*self.hidden_size)
         self.u = nn.Linear(2*self.hidden_size+self.topic_size,2*self.hidden_size)
         self.tanh = nn.Tanh()

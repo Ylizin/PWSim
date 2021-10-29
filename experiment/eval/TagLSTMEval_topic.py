@@ -28,6 +28,9 @@ class LSTMEval(GeneralEval):
         self.vae_path = args.vae_path
         self.init_fe()
         
+        #   使用丰富后的内容作为query，相当于新的，更复杂的查询数据  
+        self.use_ext_query = args.use_ext_query
+
         self.model_str = "TagLSTMEval_topic"
 
         self.init_loss()
@@ -88,15 +91,17 @@ class LSTMEval(GeneralEval):
                 l = l.to(torch.float)
                 text2 = self.data_set[id2]
                 
-                # raw text topic useless
+                # 用于生成topic的 bow分布，是用丰富后的还是丰富前的
                 bows2 = self.ext_df[id2] 
 #                 bows2 = self.bow[id2]
-                # extract a column of a dataframe
-                # and tolist it  
-#                 f1,_ = self.feature_extractor([torch.LongTensor(s) for s in id1],self.get_BoWs(self.query_ext(id1)),self.vae)
-                f1,_ = self.feature_extractor([torch.LongTensor(s) for s in self.query_ext(id1)],self.get_BoWs(self.query_ext(id1)),self.vae)    # the query using ext texts as raw text
+                if self.use_ext_query:
+                    # query 向量， 使用ext之后的tag作为query
+                    f1,_ = self.feature_extractor([torch.LongTensor(s) for s in self.query_ext(id1)],self.get_BoWs(self.query_ext(id1)),self.vae)    # the query using ext texts as raw text
+                else:
+                    # query 向量， 使用原始的tag作为query
+                    f1,_ = self.feature_extractor([torch.LongTensor(s) for s in id1],self.get_BoWs(self.query_ext(id1)),self.vae)
+                    
 #                 f1 = torch.stack([torch.mean(self.emb(torch.LongTensor(i)),dim = 0) for i in id1],dim=0).cuda()
-
                 f2,_ = self.feature_extractor(text2.tolist(),bows2.tolist(),self.vae)
                 # f1 = torch.mean(torch.stack([self.feature_extractor(t[1].tolist()) for t in text1.items()],dim=-1),dim=-1)
                 # f2 = torch.mean(torch.stack([self.feature_extractor(t[1].tolist()) for t in text2.items()],dim=-1),dim=-1)
@@ -161,7 +166,7 @@ class LSTMEval(GeneralEval):
             res[i]=pd.DataFrame(table).mean().T
 
             #print('ave_pre:{}\tave_rec:{}'.format(np.mean(p),np.mean(r)))
-            pickle.dump(pred,open('./topic_pred','wb'))
+            # pickle.dump(pred,open('./topic_pred','wb'))
             # pickle.dump(self.test_record,open('./true_{}'.format(i),'wb'))
             torch.autograd.set_grad_enabled(True)
         pd.DataFrame(res).T.to_csv('./out/'+self.model_str+str(self.train_test_id)+'.csv')
