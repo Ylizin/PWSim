@@ -26,6 +26,7 @@ class LSTMEval(GeneralEval):
         self.di = self.data_set.di
         self.vae_path = args.vae_path
         self.init_fe()
+        self.use_ext_query = args.use_ext_query
 
         self.model_str = "TagBertEval_topic"
 
@@ -44,7 +45,7 @@ class LSTMEval(GeneralEval):
 
 
     def init_optim(self):
-        self.optim = optim.Adam([{'params':self.feature_extractor.parameters()},{'params':self.vae.parameters()}],lr = self.args.lr,weight_decay = self.args.weight_decay)
+        self.optim = optim.Adam([{'params':self.feature_extractor.parameters()},{'params':self.vae.parameters()}],lr = self.args.bertLr,weight_decay = self.args.weight_decay)
 
 #         self.optim = optim.Adam(self.feature_extractor.parameters(),self.args.lr,weight_decay = self.args.weight_decay)
 
@@ -58,7 +59,7 @@ class LSTMEval(GeneralEval):
             l = [b[2] for b in batch]
             l = torch.LongTensor(l)
             return id1,id2,l
-        self.train_data_loader = DataLoader(self.train_pairs,batch_size=self.args.batch_size,collate_fn = collate_f)
+        self.train_data_loader = DataLoader(self.train_pairs,batch_size=self.args.bert_batch_size,collate_fn = collate_f)
         # load from self.data_set.tag_df
         self.ids_loader = DataLoader(self.df_idx,batch_size = self.args.batch_size)
     
@@ -78,14 +79,19 @@ class LSTMEval(GeneralEval):
                 l = l.to(torch.float)
                 text2 = self.raw[id2]
                 
-#                 bows2 = self.ext_df[id2]
-                bows2 = self.bow[id2]
+                bows2 = self.ext_df[id2]
+                # bows2 = self.bow[id2]
                 # extract a column of a dataframe
                 # and tolist it  
 #                 f1,_ = self.feature_extractor([torch.LongTensor(s) for s in id1],self.get_BoWs(id1),self.vae)
-                f1,_ = self.feature_extractor([' '.join([self.di.id2token[i] for i in s]) for s in id1],self.get_BoWs(self.query_ext(id1)),self.vae)
+                if self.use_ext_query:
+                    # query 向量， 使用ext之后的tag作为query
+                    f1,_ = self.feature_extractor([' '.join([self.di.id2token[i] for i in s]) for s in self.query_ext(id1)],self.get_BoWs(self.query_ext(id1)),self.vae)    # the query using ext texts as raw text
+                else:
+                    # query 向量， 使用原始的tag作为query
+                    f1,_ = self.feature_extractor([torch.LongTensor(s) for s in id1],self.get_BoWs(self.query_ext(id1)),self.vae)
+                # f1,_ = self.feature_extractor([' '.join([self.di.id2token[i] for i in s]) for s in id1],self.get_BoWs(self.query_ext(id1)),self.vae)
 #                 f1 = torch.stack([torch.mean(self.emb(torch.LongTensor(i)),dim = 0) for i in id1],dim=0).cuda()
-
                 f2,_ = self.feature_extractor(text2.tolist(),bows2.tolist(),self.vae)
                 # f1 = torch.mean(torch.stack([self.feature_extractor(t[1].tolist()) for t in text1.items()],dim=-1),dim=-1)
                 # f2 = torch.mean(torch.stack([self.feature_extractor(t[1].tolist()) for t in text2.items()],dim=-1),dim=-1)
@@ -114,7 +120,7 @@ class LSTMEval(GeneralEval):
                 all_f.append(_f.cpu())
             all_f = torch.cat(all_f,dim = 0).view(len(self.data_set),-1)
             
-            topks = [1,5,10,15,20,25,30]
+            topks = [1,5,10,15,20]
             p,r,f,n = defaultdict(list),defaultdict(list),defaultdict(list),defaultdict(list)
             pred = {}
 
@@ -144,7 +150,8 @@ class LSTMEval(GeneralEval):
             table = {'p':p,'r':r,'f':f,'n':n}
             res[i]=pd.DataFrame(table).mean().T
 
-            print(res[i])
+            print(table)
+
             pickle.dump(pred,open('./topic_pred','wb'))
             # pickle.dump(self.test_record,open('./true_{}'.format(i),'wb'))
             torch.autograd.set_grad_enabled(True)

@@ -1,6 +1,8 @@
 #%%
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 import pandas as pd
+import numpy as np
+from matplotlib import pyplot as plt
 from gensim.corpora import Dictionary
 import pickle
 from itertools import chain
@@ -11,10 +13,11 @@ tag2explan = dict(filter(lambda x: x[1] is not None and len(
     x[1].strip().split()) > 3, tag2explan.items()))
 
 df = pd.read_csv(r'./processed.csv')
-
+f_t = set(['data', 'reference', 'other', '', 'tools',
+           'application development', 'api'])
 
 def parse_list(s):
-    return eval(s)
+    return list(filter(lambda x:x not in f_t,eval(s)))
 
 
 def parse_set(s):
@@ -29,18 +32,16 @@ d.id2token = {v: k for k, v in d.token2id.items()}
 c = [d.doc2bow(l) for l in inp]
 
 #%%
-cats = df.Categories.apply(parse_list)
-main_cat = cats.apply(lambda x: x[0])
-f_t = set(['data', 'reference', 'other', '', 'search', 'tools',
-           'application development', 'project management', 'api'])
+main_cat = df.Categories.apply(parse_list).apply(lambda x: x[0] if x else '')
+
+df = df[main_cat.apply(lambda x:x != '')]
 
 
 main_cat = main_cat[main_cat.apply(lambda x:x not in f_t)]
 c = Counter(main_cat.to_list())
 coun = pd.Series(c)
-main_coun = coun[coun > 122]
-sel_cats = set(main_coun.index)
-df = df[cats.apply(lambda x:x[0] in sel_cats)]
+# main_coun = coun[coun > 122]
+# sel_cats = set(main_coun.index)
 df['main_cat'] = df.Categories.apply(lambda x: parse_list(x)[0])
 
 
@@ -54,7 +55,7 @@ tag_freq = pd.Series(list(tag_di.dfs.values()))
 # filter too frequent tags
 # filtered_tags = set(tags[tag_freq < 500].tolist())
 # cats = cats.apply(lambda x: x.intersection(filtered_tags))
-
+#%%
 des = df.loc[cats.index, 'Description']
 cat_len = cats.apply(lambda x: len(x))
 cats = cats[cat_len.apply(lambda x: 2 <= x < 7)]

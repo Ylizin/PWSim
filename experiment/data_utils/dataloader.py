@@ -92,11 +92,11 @@ class TagDataSet(Dataset):
     
         self.main_ids = self.ori_df.iloc[:,5].apply(lambda x:[(x,1)])
           
-                                                                    #1 for raw
+                                                                    #2 for ext
         self.ext_df = self.ori_df.iloc[:,2].str.cat(self.ori_df.iloc[:,1],sep = ' ').apply(d2b) # the ext contains tags and exts 
         
         self.df_idx = self.tag_df.index
-        self.raw_df = self.ori_df.iloc[:,1].apply(d2i)
+        self.raw_df = self.ori_df.iloc[:,1]#.apply(d2i)
 
     def init_train_test(self,train_test_id = 0):
         self.train_pairs = pickle.load(open(train_pairs+str(train_test_id),'rb'))
