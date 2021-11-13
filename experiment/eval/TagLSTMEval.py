@@ -102,9 +102,10 @@ class LSTMEval(GeneralEval):
             pred = {}
 
             for test_k in self.test_keys:
-                text1 = [torch.LongTensor(self.query_ext([self.data_set.pos[test_k][0]]))[0]]
-#                 text1 = [torch.LongTensor(self.data_set.pos[test_k][0])]
-
+                if self.use_ext_query:
+                    text1 = [torch.LongTensor(self.query_ext([self.data_set.pos[test_k][0]]))[0]]
+                else:
+                    text1 = [torch.LongTensor(self.data_set.pos[test_k][0])]
                 pos_ids = list(self.data_set.pos[test_k][1])
                 test_f = self.feature_extractor(text1).cpu()
                 sims = self.relu(self.cos(test_f,all_f))

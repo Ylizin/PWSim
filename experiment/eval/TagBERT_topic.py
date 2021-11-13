@@ -127,7 +127,11 @@ class LSTMEval(GeneralEval):
             for test_k in self.test_keys:
 #                 text_bow = self.get_BoWs([self.data_set.pos[test_k][0]])
                 text_bow = self.get_BoWs(self.query_ext([self.data_set.pos[test_k][0]]))
-                text1 = ' '.join([self.di.id2token[i] for i in self.data_set.pos[test_k][0]])
+                if self.use_ext_query:
+                    text1 = ' '.join([self.di.id2token[i] for i in self.query_ext(self.data_set.pos[test_k][0])])
+                else:
+                    text1 = ' '.join([self.di.id2token[i] for i in self.data_set.pos[test_k][0]])
+                
                 pos_ids = list(self.data_set.pos[test_k][1])
                 test_f,*_ = self.feature_extractor(text1,text_bow,self.vae)
                 
