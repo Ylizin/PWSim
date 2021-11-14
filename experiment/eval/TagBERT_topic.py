@@ -128,7 +128,7 @@ class LSTMEval(GeneralEval):
 #                 text_bow = self.get_BoWs([self.data_set.pos[test_k][0]])
                 text_bow = self.get_BoWs(self.query_ext([self.data_set.pos[test_k][0]]))
                 if self.use_ext_query:
-                    text1 = ' '.join([self.di.id2token[i] for i in self.query_ext(self.data_set.pos[test_k][0])])
+                    text1 = ' '.join([self.di.id2token[i] for i in self.query_ext([self.data_set.pos[test_k][0]])[0]])
                 else:
                     text1 = ' '.join([self.di.id2token[i] for i in self.data_set.pos[test_k][0]])
                 
