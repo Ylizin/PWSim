@@ -10,9 +10,9 @@ from data_utils.paths import embedding_path,idf_path,vae_path
 import argparse
 glob_args = argparse.ArgumentParser('glob')
 glob_args.add_argument("--batch_size", type=int, default=512)
-glob_args.add_argument("--bert_batch_size", type=int, default=64)
+glob_args.add_argument("--bert_batch_size", type=int, default=8)
 
-glob_args.add_argument("--bertLr", type=float, default=3e-5)
+glob_args.add_argument("--bertLr", type=float, default=1e-5)
 glob_args.add_argument("--lr", type=float, default=3e-4)
 
 glob_args.add_argument("--weight_decay", type=float, default=0)

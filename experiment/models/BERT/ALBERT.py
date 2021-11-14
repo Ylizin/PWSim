@@ -8,8 +8,8 @@ class BERT(nn.Module):
         super().__init__()
             
         
-        self.tokenizer = AutoTokenizer.from_pretrained("prajjwal1/bert-tiny")
-        self.model =  AutoModelForMaskedLM.from_pretrained("prajjwal1/bert-tiny")
+        self.tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
+        self.model =  AutoModelForMaskedLM.from_pretrained("distilbert-base-uncased")
   
         self.cu = torch.cuda.is_available()
         if self.cu:

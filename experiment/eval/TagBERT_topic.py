@@ -61,7 +61,7 @@ class LSTMEval(GeneralEval):
             return id1,id2,l
         self.train_data_loader = DataLoader(self.train_pairs,batch_size=self.args.bert_batch_size,collate_fn = collate_f)
         # load from self.data_set.tag_df
-        self.ids_loader = DataLoader(self.df_idx,batch_size = self.args.batch_size)
+        self.ids_loader = DataLoader(self.df_idx,batch_size = self.args.bert_batch_size)
     
 
     
