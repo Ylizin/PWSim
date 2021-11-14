@@ -12,7 +12,7 @@ glob_args = argparse.ArgumentParser('glob')
 glob_args.add_argument("--batch_size", type=int, default=512)
 glob_args.add_argument("--bert_batch_size", type=int, default=64)
 
-glob_args.add_argument("--bertLr", type=float, default=3e-4)
+glob_args.add_argument("--bertLr", type=float, default=3e-5)
 glob_args.add_argument("--lr", type=float, default=3e-4)
 
 glob_args.add_argument("--weight_decay", type=float, default=0)

@@ -140,7 +140,7 @@ class LSTMEval(GeneralEval):
                 text_bow = self.get_BoWs(self.query_ext([self.data_set.pos[test_k][0]]))
                 
                 if self.use_ext_query:
-                    text1 = [torch.LongTensor(self.query_ext([self.data_set.pos[test_k][0]]))[0]]
+                    text1 = [torch.LongTensor(self.query_ext([self.data_set.pos[test_k][0]]))]
                 else:
                     text1 = [torch.LongTensor(self.data_set.pos[test_k][0])]
 
