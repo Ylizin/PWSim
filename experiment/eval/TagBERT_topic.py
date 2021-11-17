@@ -89,7 +89,7 @@ class LSTMEval(GeneralEval):
                     f1,_ = self.feature_extractor([' '.join([self.di.id2token[i] for i in s]) for s in self.query_ext(id1)],self.get_BoWs(self.query_ext(id1)),self.vae)    # the query using ext texts as raw text
                 else:
                     # query 向量， 使用原始的tag作为query
-                    f1,_ = self.feature_extractor([torch.LongTensor(s) for s in id1],self.get_BoWs(self.query_ext(id1)),self.vae)
+                    f1,_ = self.feature_extractor([' '.join([self.di.id2token[i] for i in s])for s in id1],self.get_BoWs(self.query_ext(id1)),self.vae)
                 # f1,_ = self.feature_extractor([' '.join([self.di.id2token[i] for i in s]) for s in id1],self.get_BoWs(self.query_ext(id1)),self.vae)
 #                 f1 = torch.stack([torch.mean(self.emb(torch.LongTensor(i)),dim = 0) for i in id1],dim=0).cuda()
                 f2,_ = self.feature_extractor(text2.tolist(),bows2.tolist(),self.vae)

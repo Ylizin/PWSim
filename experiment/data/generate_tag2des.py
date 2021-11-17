@@ -50,15 +50,20 @@ cats = df.Categories.apply(parse_set)
 # filter too much tags services
 tag_di = Dictionary(cats.to_list())
 tag_di.id2token = {v: k for k, v in tag_di.token2id.items()}
-# tags = pd.Series(list(map(lambda x: tag_di.id2token[x], tag_di.dfs.keys())))
+tags = pd.Series(list(map(lambda x: tag_di.id2token[x], tag_di.dfs.keys())))
 tag_freq = pd.Series(list(tag_di.dfs.values()))
 # filter too frequent tags
-# filtered_tags = set(tags[tag_freq < 500].tolist())
-# cats = cats.apply(lambda x: x.intersection(filtered_tags))
+filtered_tags = set(tags[tag_freq < 400].tolist())
+cats = cats.apply(lambda x: x.intersection(filtered_tags))
+#%%
+import numpy as np
+from matplotlib import pyplot as plt
+plt.hist(tag_freq,bins=np.arange(0,1250,10))
+plt.xlim((0,1250))
 #%%
 des = df.loc[cats.index, 'Description']
 cat_len = cats.apply(lambda x: len(x))
-cats = cats[cat_len.apply(lambda x: 2 <= x < 7)]
+cats = cats[cat_len.apply(lambda x: 2 < x < 7)]
 
 cats_id = cats.apply(tag_di.doc2idx)
 main_ids = df.main_cat.apply(lambda x: tag_di.token2id[x])
@@ -66,8 +71,6 @@ cats_id = cats_id.apply(set)
 df = df.loc[cats.index]
 df['cats_id'] = cats_id
 #%%
-
-
 def find_common_tags(i, j, cats_id, tags):
     # 找到所有满足要求的tags
     if len(cats_id.iloc[i]) < 3 or len(cats_id.iloc[j]) < 3:
@@ -77,21 +80,18 @@ def find_common_tags(i, j, cats_id, tags):
         tags.add(','.join(map(str, common_ids)))
 
 
-def mp_f(group_df):
+def mp_f(i,cats_id):
     tags = set()
-    cats_id = group_df.cats_id
-    for i in range(len(cats_id)):
-        for j in range(i+1,len(cats_id)):
-            find_common_tags(i, j, cats_id, tags)
+    for j in range(i+1,len(cats_id)):
+        find_common_tags(i, j, cats_id, tags)
     return tags
 
 
 tags = set()
 with ProcessPoolExecutor(max_workers=20) as exc:
-    for _,group_df in df.groupby('main_cat'):
-        exc.submit(mp_f,group_df).add_done_callback(
+    for i in range(len(cats_id)):
+        exc.submit(mp_f,i,cats_id).add_done_callback(
             lambda x: tags.update(x.result()))
-print("tags len:{}",len(tags))
 
 # tag2servs = {query:{score:[]}}
 # 拿到和tags匹配的所有des
@@ -119,7 +119,7 @@ with ProcessPoolExecutor(max_workers=20) as exc:
         exc.submit(mp_get_servs, tag).add_done_callback(
             lambda x: tag2servs.update(x.result()))
 # tag2servs = {k:[(li,s) for s,li in v.items()] for k,v in tag2servs.items()}
-print("tag2servs len:{}",len(tags))
+print("tag2servs len:{}",len(tag2servs))
 
 #%%
 tag_di.id2token = {v: k for k, v in tag_di.token2id.items()}
