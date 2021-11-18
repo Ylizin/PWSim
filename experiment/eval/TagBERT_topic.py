@@ -113,8 +113,8 @@ class LSTMEval(GeneralEval):
             all_f = []
             for _ids in self.ids_loader:
                 _t = self.raw[_ids.cpu().numpy()]
-                _b = self.bow[_ids.cpu().numpy()]
-#                 _b = self.ext_df[_ids.cpu().numpy()]
+                # _b = self.bow[_ids.cpu().numpy()]
+                _b = self.ext_df[_ids.cpu().numpy()]
                 _f,*_ = self.feature_extractor(_t.tolist(),_b,self.vae)
 
                 all_f.append(_f.cpu())
