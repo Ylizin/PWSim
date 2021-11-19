@@ -54,8 +54,9 @@ class GeneralEval:
     # f1,ndcg
     def get_metrics(self,sims_sort,pos_ids,topk,threshold = 0.5):
         # pos ids -> [(li,score)]
-        
-        pos_ids = list(filter(lambda x:x[1]>=threshold,sorted(pos_ids,key = lambda x:x[0],reverse = True)))
+
+        # score^2大于阈值才进行计算，目的是加强对完全匹配的奖励，例如完全匹配:1 ,匹配3/4为 0.75^2, 3/6 为 0.5^2
+        pos_ids = list(filter(lambda x: (x[1])**2 >=threshold,sorted(pos_ids,key = lambda x:x[0],reverse = True)))
         id2score = {_id:s for li,s in pos_ids for _id in li}
         sims_sort_np = np.array(sims_sort[:topk])
         pos_ids_np = np.array([idx for i in pos_ids for idx in i[0]]).reshape(-1)

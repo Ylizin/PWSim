@@ -80,19 +80,20 @@ def find_common_tags(i, j, cats_id, tags):
         tags.add(','.join(map(str, common_ids)))
 
 
-def mp_f(i,cats_id):
+def mp_f(group_df):
     tags = set()
-    for j in range(i+1,len(cats_id)):
-        find_common_tags(i, j, cats_id, tags)
+    cats_id = group_df.cats_id
+    for i in range(len(cats_id)):
+        for j in range(i+1,len(cats_id)):
+            find_common_tags(i, j, cats_id, tags)
     return tags
 
 
 tags = set()
 with ProcessPoolExecutor(max_workers=20) as exc:
-    for i in range(len(cats_id)):
-        exc.submit(mp_f,i,cats_id).add_done_callback(
+    for _,group_df in df.groupby('main_cat'):
+        exc.submit(mp_f,group_df).add_done_callback(
             lambda x: tags.update(x.result()))
-
 # tag2servs = {query:{score:[]}}
 # 拿到和tags匹配的所有des
 
