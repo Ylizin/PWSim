@@ -25,12 +25,14 @@ def parse_set(s):
     s = set(filter(lambda x:x not in f_t,eval(s)))
     return s
 
+def parse_noun_chunk(s):
+    return eval(s)
 
 inp = df.Description.str.split().tolist()
 d = Dictionary(inp)
 d.id2token = {v: k for k, v in d.token2id.items()}
 c = [d.doc2bow(l) for l in inp]
-
+df['chunks'] = df['chunks'].apply(parse_noun_chunk)
 #%%
 main_cat = df.Categories.apply(parse_list).apply(lambda x: x[0] if x else '')
 

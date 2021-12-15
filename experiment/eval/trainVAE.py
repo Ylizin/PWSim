@@ -19,7 +19,7 @@ class VAEEval(GeneralEval):
         self.df_idx = self.data_set.df_idx
         self.df =  self.data_set.ext_df
 #         self.df =  self.data_set.bow_df
-        self.pred = self.data_set.main_ids
+        # self.pred = self.data_set.main_ids
         
         self.is_serv = 1
         self.init_fe()
@@ -49,7 +49,7 @@ class VAEEval(GeneralEval):
             if self.is_serv:
                 for ids in self.ids_loader:
                     text_bow = self.df[ids.cpu().numpy()]
-                    _pred = self.pred[ids.cpu().numpy()]
+                    # _pred = self.pred[ids.cpu().numpy()]
                     out_bows,*_,mu,log_var,in_bows = self.feature_extractor(text_bow.tolist())
                     loss = self.loss(in_bows,out_bows,mu,log_var)   
                     

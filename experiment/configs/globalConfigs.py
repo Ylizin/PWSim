@@ -1,5 +1,5 @@
 embedding_size = 300
-di_size = 18000
+di_size = 20000
 total_idx_len = 3888
 test_idx_len = 1167 
 train_idx_len = 2721
@@ -18,7 +18,7 @@ glob_args.add_argument("--lr", type=float, default=3e-3)
 glob_args.add_argument("--weight_decay", type=float, default=0)
 glob_args.add_argument('--cuda',type=bool,default=CUDA)
 glob_args.add_argument("--vae_path", type=str, default=vae_path)
-glob_args.add_argument('--use_ext_query',type=bool,default=True)
+glob_args.add_argument('--use_ext_query',type=bool,default=False)
 glob_args.add_argument("--nepochs", type=int, default=30)
 glob_args.add_argument("--topk", type=int, default=20)
 glob_args.add_argument("-f", type=str, default='')

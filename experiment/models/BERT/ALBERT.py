@@ -10,7 +10,7 @@ class BERT(nn.Module):
         
         self.tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
         self.model =  AutoModelForMaskedLM.from_pretrained("distilbert-base-uncased")
-  
+
         self.cu = torch.cuda.is_available()
         if self.cu:
             self.model = self.model.cuda()

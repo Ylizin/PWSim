@@ -1,6 +1,7 @@
 #%%
 import pickle
 from itertools import chain
+from nltk import chunk
 
 import numpy as np
 import pandas as pd
@@ -25,26 +26,33 @@ tag2explan = pickle.load(open('./explan','rb'))
 tag_di = pickle.load(open('tag_di','rb'))
 tag2servs = pickle.load(open('tag2servs','rb'))
 df = pd.read_csv(r'./filtered_datas.csv',index_col=0)
+cat_noun_chunk = lambda s: ' '.join([tok*int(s*5) for tok,s in eval(s)])
 #%%
 # all servs presented
 all_servs = set()
 for tag in tag2servs.values():
     for servs,_ in tag:
         all_servs |= set(servs)
-tag_servs = df.loc[all_servs]['internal_enrich'].apply(lem)
-raw_servs = df.loc[all_servs]['Description'].apply(lem)
+
+raw_servs = df.loc[all_servs]['Description']
+chunk_str = df.loc[all_servs].chunks.apply(cat_noun_chunk)
+tag_servs = raw_servs+chunk_str
+raw_servs = raw_servs.apply(lem)
+tag_servs = tag_servs.apply(lem)
+
 servs_tag = df.loc[all_servs]['Categories'].apply(parse_list)
 servs_tag_ext = servs_tag.apply(ext_servs)
 servs_tag_ids = servs_tag.apply(tag_di.doc2bow)
 
 di = Dictionary(tag_servs.tolist())
 di.add_documents(raw_servs)
+di.add_documents(chunk_str.apply(str.split).tolist())
 
 tag_di.id2token = {v:k for k,v in tag_di.token2id.items()}
 tag_servs = tag_servs.apply(' '.join)
 raw_servs = raw_servs.apply(' '.join)
 
-tag_servs = pd.DataFrame([tag_servs,raw_servs,servs_tag_ext,servs_tag_ids]).T
+tag_servs = pd.DataFrame([tag_servs,raw_servs,servs_tag_ext,servs_tag_ids,chunk_str]).T
 
 #%%
 ori_para={}
@@ -90,8 +98,8 @@ for k,v in tag2servs_di.items():
 #%%
 d2idx = lambda x: ' '.join(map(str,di.doc2idx(x)))
 ori2raw = {d2idx(k.strip().split()):d2idx(v) for k,v in ori2raw.items()}
-tag_servs['main_cat'] = df.main_cat.apply(lambda x:[x])
-tag_servs['main_ids'] = df.main_ids
+# tag_servs['main_cat'] = df.main_cat.apply(lambda x:[x])
+# tag_servs['main_ids'] = df.main_ids
 
 tag_servs.to_csv('./tag_servs.csv',header=None)
 pickle.dump(tag2servs_tup,open('./pos_tag2servs','wb'))

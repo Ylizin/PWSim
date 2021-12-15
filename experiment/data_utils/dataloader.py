@@ -83,19 +83,20 @@ class TagDataSet(Dataset):
     def map_word2id(self,BoW = False):
         d2b = lambda x: self.filter_noise(self.di.doc2bow(x.strip().split()))
         d2i = lambda x: torch.tensor(self.filter_noise(self.di.doc2idx(x.strip().split())))
-        if BoW:
-                                        # 1 for raw
-            self.bow_df = self.ori_df.iloc[:,1].apply(d2b)# use enhanced 
+        # if BoW:
+                                        # 1 for raw ,0 add chunks
+            # self.bow_df = self.ori_df.iloc[:,1].apply(d2b)# use enhanced 
         self.tag_ids = self.ori_df.iloc[:,3].apply(parse_list)
 #         self.tag_df = self.ori_df.iloc[:,0].apply(d2i) # use enhanced 
-        self.tag_df = self.ori_df.iloc[:,1].apply(d2i)  # do not use enhanced 
+        self.raw_ids = self.ori_df.iloc[:,1].apply(d2i)  # do not use enhanced 
     
-        self.main_ids = self.ori_df.iloc[:,5].apply(lambda x:[(x,1)])
+        # self.main_ids = self.ori_df.iloc[:,5].apply(lambda x:[(x,1)])
           
-                                                                    #2 for ext
-        self.ext_df = self.ori_df.iloc[:,2].str.cat(self.ori_df.iloc[:,1],sep = ' ').apply(d2b) # the ext contains tags and exts 
-        
-        self.df_idx = self.tag_df.index
+                                                                    #2 for ext 0 for enrich
+        # self.ext_df = self.ori_df.iloc[:,2].str.cat(self.ori_df.iloc[:,0],sep = ' ').apply(d2b) # ext contains tags and exts 
+        self.ext_df = self.ori_df.iloc[:,2].apply(d2b)#.str.cat(self.ori_df.iloc[:,4],sep = ' ').apply(d2b)
+        self.chunk_ids = self.ori_df.iloc[:,4].apply(d2i)
+        self.df_idx = self.raw_ids.index
         self.raw_df = self.ori_df.iloc[:,1]#.apply(d2i)
 
     def init_train_test(self,train_test_id = 0):
@@ -118,7 +119,7 @@ class TagDataSet(Dataset):
 #         pickle.dump(self.test_keys,open(test_pairs,'wb'))
 
     def __getitem__(self,_id):
-        return self.tag_df[_id]
+        return self.raw_ids[_id]
 
     def __len__(self):
-        return len(self.tag_df)
+        return len(self.raw_ids)
