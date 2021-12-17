@@ -26,7 +26,7 @@ tag2explan = pickle.load(open('./explan','rb'))
 tag_di = pickle.load(open('tag_di','rb'))
 tag2servs = pickle.load(open('tag2servs','rb'))
 df = pd.read_csv(r'./filtered_datas.csv',index_col=0)
-cat_noun_chunk = lambda s: ' '.join([(tok+' ')*int(s*5) for tok,s in eval(s)])
+cat_noun_chunk = lambda li_str: ' '.join([(tok+' ')*int(s*5) for tok,s in eval(li_str)])
 #%%
 # all servs presented
 all_servs = set()
@@ -52,7 +52,8 @@ tag_di.id2token = {v:k for k,v in tag_di.token2id.items()}
 tag_servs = tag_servs.apply(' '.join)
 raw_servs = raw_servs.apply(' '.join)
 
-tag_servs = pd.DataFrame([tag_servs,raw_servs,servs_tag_ext,servs_tag_ids,chunk_str]).T
+tag_servs = pd.DataFrame([tag_servs,raw_servs,servs_tag_ext,servs_tag_ids,chunk_str,df.loc[all_servs].chunks]).T
+tag_servs.to_csv('./tag_servs.csv',header=None)
 
 #%%
 ori_para={}
@@ -101,7 +102,6 @@ ori2raw = {d2idx(k.strip().split()):d2idx(v) for k,v in ori2raw.items()}
 # tag_servs['main_cat'] = df.main_cat.apply(lambda x:[x])
 # tag_servs['main_ids'] = df.main_ids
 
-tag_servs.to_csv('./tag_servs.csv',header=None)
 pickle.dump(tag2servs_tup,open('./pos_tag2servs','wb'))
 pickle.dump(neg_tag2servs_tup,open('./neg_tag2servs','wb'))
 pickle.dump(di,open('./dict','wb'))

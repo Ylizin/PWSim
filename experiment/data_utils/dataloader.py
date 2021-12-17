@@ -88,7 +88,8 @@ class TagDataSet(Dataset):
             # self.bow_df = self.ori_df.iloc[:,1].apply(d2b)# use enhanced 
         self.tag_ids = self.ori_df.iloc[:,3].apply(parse_list)
 #         self.tag_df = self.ori_df.iloc[:,0].apply(d2i) # use enhanced 
-        self.raw_ids = self.ori_df.iloc[:,1].apply(d2i)  # do not use enhanced 
+        # 0 enhanced , 1 not enhanced
+        self.raw_ids = self.ori_df.iloc[:,0].apply(d2i)  
     
         # self.main_ids = self.ori_df.iloc[:,5].apply(lambda x:[(x,1)])
           
