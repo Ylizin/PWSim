@@ -95,7 +95,7 @@ class TagDataSet(Dataset):
           
                                                                     #2 for ext 0 for enrich
         # self.ext_df = self.ori_df.iloc[:,2].str.cat(self.ori_df.iloc[:,0],sep = ' ').apply(d2b) # ext contains tags and exts 
-        self.ext_df = self.ori_df.iloc[:,2].str.cat(self.ori_df.iloc[:,4],sep = ' ').apply(d2b)
+        self.ext_df = self.ori_df.iloc[:,2].apply(d2b)#str.cat(self.ori_df.iloc[:,4],sep = ' ').apply(d2b)
         self.chunk_ids = self.ori_df.iloc[:,4].apply(d2i)
         self.df_idx = self.raw_ids.index
         self.raw_df = self.ori_df.iloc[:,1]#.apply(d2i)

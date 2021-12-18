@@ -21,7 +21,7 @@ class LSTMEval(GeneralEval):
         self.test_keys = self.data_set.test_keys
         self.df_idx = self.data_set.df_idx
         self.ext_df = self.data_set.ext_df
-        self.bow = self.data_set.bow_df
+        # self.bow = self.data_set.bow_df
         self.raw = self.data_set.raw_df
         self.di = self.data_set.di
         self.vae_path = args.vae_path
