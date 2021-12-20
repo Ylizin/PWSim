@@ -26,7 +26,8 @@ tag2explan = pickle.load(open('./explan','rb'))
 tag_di = pickle.load(open('tag_di','rb'))
 tag2servs = pickle.load(open('tag2servs','rb'))
 df = pd.read_csv(r'./filtered_datas.csv',index_col=0)
-cat_noun_chunk = lambda li_str: ' '.join([(tok+' ')*int(s*5) for tok,s in eval(li_str)])
+cat_noun_chunk = lambda li_str: ' '.join([tok for tok,s in eval(li_str)])
+goal_noun_chunk = lambda li_str:' '.join([noun for verb,noun in eval(li_str)])
 #%%
 # all servs presented
 all_servs = set()
@@ -36,7 +37,9 @@ for tag in tag2servs.values():
 
 raw_servs = df.loc[all_servs]['Description']
 chunk_str = df.loc[all_servs].chunks.apply(cat_noun_chunk)
-tag_servs = raw_servs+chunk_str
+goal_str = df.loc[all_servs].goals.apply(goal_noun_chunk)
+#%%
+tag_servs = raw_servs.str.cat(chunk_str,sep = ' ').str.cat(goal_str,sep = ' ')
 raw_servs = raw_servs.apply(lem)
 tag_servs = tag_servs.apply(lem)
 
