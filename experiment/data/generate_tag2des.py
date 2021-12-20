@@ -32,7 +32,9 @@ inp = df.Description.str.split().tolist()
 d = Dictionary(inp)
 d.id2token = {v: k for k, v in d.token2id.items()}
 c = [d.doc2bow(l) for l in inp]
-# df['chunks'] = df['chunks'].apply(parse_noun_chunk)
+df= df.loc[df['chunks'].apply(parse_noun_chunk).dropna().index]
+df= df[df['goals'].apply(parse_noun_chunk).dropna().apply(lambda x:len(x)>1)]
+
 #%%
 main_cat = df.Categories.apply(parse_list).apply(lambda x: x[0] if x else '')
 

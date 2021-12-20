@@ -42,6 +42,8 @@ goal_str = df.loc[all_servs].goals.apply(goal_noun_chunk)
 tag_servs = raw_servs.str.cat(chunk_str,sep = ' ').str.cat(goal_str,sep = ' ')
 raw_servs = raw_servs.apply(lem)
 tag_servs = tag_servs.apply(lem)
+chunk_str = chunk_str.apply(lem)
+goal_str = goal_str.apply(lem)
 
 servs_tag = df.loc[all_servs]['Categories'].apply(parse_list)
 servs_tag_ext = servs_tag.apply(ext_servs)
@@ -49,13 +51,14 @@ servs_tag_ids = servs_tag.apply(tag_di.doc2bow)
 
 di = Dictionary(tag_servs.tolist())
 di.add_documents(raw_servs)
-di.add_documents(chunk_str.apply(str.split).tolist())
+di.add_documents(chunk_str.tolist())
+di.add_documents(goal_str.tolist())
 
 tag_di.id2token = {v:k for k,v in tag_di.token2id.items()}
 tag_servs = tag_servs.apply(' '.join)
 raw_servs = raw_servs.apply(' '.join)
 
-tag_servs = pd.DataFrame([tag_servs,raw_servs,servs_tag_ext,servs_tag_ids,chunk_str,df.loc[all_servs].chunks]).T
+tag_servs = pd.DataFrame([tag_servs,raw_servs,servs_tag_ext,servs_tag_ids,chunk_str,goal_str,df.loc[all_servs].chunks]).T
 tag_servs.to_csv('./tag_servs.csv',header=None)
 
 #%%
