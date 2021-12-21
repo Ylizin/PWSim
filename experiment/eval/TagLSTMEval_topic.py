@@ -129,7 +129,7 @@ class LSTMEval(GeneralEval):
                 all_f.append(_f.cpu())
             all_f = torch.cat(all_f,dim = 0).view(len(self.data_set),-1)
             
-            topks = [5,10,15,20]
+            topks = [1,5,10,15,20]
             p,r,f,n = defaultdict(list),defaultdict(list),defaultdict(list),defaultdict(list)
             pred = {}
 
