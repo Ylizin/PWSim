@@ -57,7 +57,7 @@ class VAEEval(GeneralEval):
                     self.optim.zero_grad()
                     loss.backward()
                     self.optim.step()
-            else: # train them together 
+            # else: # train them together 
                 out_bows,*_,mu,log_var,in_bows = self.feature_extractor(self.keys)
                 loss = self.loss(in_bows,out_bows,mu,log_var)   
                 epoch_loss += loss.item()
