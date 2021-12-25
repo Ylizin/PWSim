@@ -58,6 +58,8 @@ tag_di.id2token = {v:k for k,v in tag_di.token2id.items()}
 tag_servs = tag_servs.apply(' '.join)
 raw_servs = raw_servs.apply(' '.join)
 
+chunk_str = chunk_str.apply(' '.join)
+goal_str = goal_str.apply(' '.join)
 tag_servs = pd.DataFrame([tag_servs,raw_servs,servs_tag_ext,servs_tag_ids,chunk_str,goal_str,df.loc[all_servs].chunks]).T
 tag_servs.to_csv('./tag_servs.csv',header=None)
 
