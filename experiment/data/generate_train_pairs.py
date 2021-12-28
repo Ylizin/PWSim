@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from gensim.corpora import Dictionary
 
-from eda import lem
+from eda import lem,synonym_replacement,random_insertion
 
 
 def lem_sent(s):
@@ -64,25 +64,27 @@ tag_servs = pd.DataFrame([tag_servs,raw_servs,servs_tag_ext,servs_tag_ids,chunk_
 tag_servs.to_csv('./tag_servs.csv',header=None)
 
 #%%
-ori_para={}
+ext_para={}
 extend_rel = {}
-ori2raw = {}
+ori2syn = {}
 for k,v in tag2servs.items():
     ori_sent = ' '.join(['{} '.format(lem_sent(tag_di.id2token[int(tag)])) for tag in k.split(',')])
     ext_sent = ' '.join([lem_sent(tag2explan[tag_di.id2token[int(tag)]]) for tag in k.split(',')])
     # ext_sent = ' '.join([lem_sent(tag2explan[tag]) for tag in syn2raw[k]])
     # ori2raw[ori_sent] = syn2raw[k]
     extend_rel[ori_sent] =ext_sent
-    ori_para[ori_sent] = v
+    ext_para[ori_sent] = v
+    ori2syn[ori_sent] = ' '.join(random_insertion(synonym_replacement(ori_sent.split())))
 
 #%%
 tag2servs_tup=[]
-for k,v in ori_para.items():
+for k,v in ext_para.items():
     for li,score in v:
         tag2servs_tup.append((k,li,score))
         
 ori2ext = {}
-tag_texts = [v.split() for v in chain(extend_rel.values(),extend_rel.keys())] + list(ori2raw.values())
+
+tag_texts = [v.split() for v in chain(extend_rel.values(),extend_rel.keys(),ori2syn.values())] 
 di.add_documents(tag_texts)
 
 tag2servs_di = {}
@@ -106,7 +108,7 @@ for k,v in tag2servs_di.items():
 
 #%%
 d2idx = lambda x: ' '.join(map(str,di.doc2idx(x)))
-ori2raw = {d2idx(k.strip().split()):d2idx(v) for k,v in ori2raw.items()}
+ori2syn = {d2idx(k.strip().split()):d2idx(v.strip().split()) for k,v in ori2syn.items()}
 # tag_servs['main_cat'] = df.main_cat.apply(lambda x:[x])
 # tag_servs['main_ids'] = df.main_ids
 
@@ -114,4 +116,4 @@ pickle.dump(tag2servs_tup,open('./pos_tag2servs','wb'))
 pickle.dump(neg_tag2servs_tup,open('./neg_tag2servs','wb'))
 pickle.dump(di,open('./dict','wb'))
 pickle.dump(ori2ext,open('./query_ext','wb'))
-pickle.dump(ori2raw,open('./ori2raw','wb'))
+pickle.dump(ori2syn,open('./ori2syn','wb'))
