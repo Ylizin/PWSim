@@ -66,7 +66,7 @@ class LSTMEval(GeneralEval):
                 # extract a column of a dataframe
                 if self.use_ext_query:
                     # query 向量， 使用ext之后的tag作为query
-                    f1 = self.feature_extractor([torch.LongTensor(s) for s in self.query_ext(id1)])    # the query using ext texts as raw text
+                    f1 = self.feature_extractor([torch.LongTensor(s) for s in self.query_syn(id1)])    # the query using ext texts as raw text
                 else:
                     # query 向量， 使用原始的tag作为query
                     f1 = self.feature_extractor([torch.LongTensor(s) for s in id1])
@@ -103,7 +103,7 @@ class LSTMEval(GeneralEval):
 
             for test_k in self.test_keys:
                 if self.use_ext_query:
-                    text1 = [torch.LongTensor(self.query_ext([self.data_set.pos[test_k][0]]))[0]]
+                    text1 = [torch.LongTensor(self.query_syn([self.data_set.pos[test_k][0]]))[0]]
                 else:
                     text1 = [torch.LongTensor(self.data_set.pos[test_k][0])]
                 pos_ids = list(self.data_set.pos[test_k][1])

@@ -15,6 +15,7 @@ class GeneralEval:
         self.optim = None
         self.init_data_set(BoW,train_test_id,raw=raw)
         self.q_ext = self.data_set.q_ext
+        self.q_syn = self.data_set.q_syn
 
     def get_cv_mean(self):
         tables = [pd.read_csv('./out/'+self.model_str+str(i)) for i in range(5)]
@@ -33,7 +34,14 @@ class GeneralEval:
             query -> [[]]
         '''
         
-        return [list(map(int,self.q_ext[' '.join(map(str,q))].split())) for q in query]        
+        return [list(map(int,self.q_ext[' '.join(map(str,q))].split())) for q in query]     
+        
+    def query_syn(self,query):
+        '''
+            query -> [[]]
+        '''
+        
+        return [list(map(int,self.q_syn[' '.join(map(str,q))].split())) for q in query]      
     
     def get_BoWs(self,seq):
         

@@ -95,7 +95,7 @@ class LSTMEval(GeneralEval):
 #                 bows2 = self.bow[id2]
                 if self.use_ext_query:
                     # query 向量， 使用ext之后的tag作为query
-                    f1,_ = self.feature_extractor([torch.LongTensor(s) for s in self.query_ext(id1)],self.get_BoWs(self.query_ext(id1)),self.vae)    # the query using ext texts as raw text
+                    f1,_ = self.feature_extractor([torch.LongTensor(s) for s in self.query_syn(id1)],self.get_BoWs(self.query_ext(id1)),self.vae)    # the query using ext texts as raw text
                 else:
                     # query 向量， 使用原始的tag作为query
                     f1,_ = self.feature_extractor([torch.LongTensor(s) for s in id1],self.get_BoWs(self.query_ext(id1)),self.vae)
@@ -139,7 +139,7 @@ class LSTMEval(GeneralEval):
                 text_bow = self.get_BoWs(self.query_ext([self.data_set.pos[test_k][0]]))
                 
                 if self.use_ext_query:
-                    text1 = [torch.LongTensor(self.query_ext([self.data_set.pos[test_k][0]])[0])]
+                    text1 = [torch.LongTensor(self.query_syn([self.data_set.pos[test_k][0]])[0])]
                 else:
                     text1 = [torch.LongTensor(self.data_set.pos[test_k][0])]
 

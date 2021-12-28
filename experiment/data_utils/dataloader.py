@@ -1,5 +1,5 @@
 from gensim.corpora import Dictionary
-from .paths import embedding_path,dict_path,neg_tag,pos_tag,train_pairs,test_pairs,query_ext,syn2raw
+from .paths import embedding_path,dict_path,neg_tag,pos_tag,train_pairs,test_pairs,query_ext,syn2raw,ori2syn
 from .process import load_texts
 import torch
 import numpy as np
@@ -23,8 +23,10 @@ def load_pos_neg():
     pos = pickle.load(open(pos_tag,'rb'))
     neg = pickle.load(open(neg_tag,'rb'))
     q_ext = pickle.load(open(query_ext,'rb'))
+    q_syn = pickle.load(open(ori2syn,'rb'))
+
     keys = [inter[0] for inter in pos]
-    return pos,neg,keys,q_ext
+    return pos,neg,keys,q_ext,q_syn
 
 def split_tags():
     ori_pos,ori_neg,*_ = load_pos_neg()
@@ -56,7 +58,7 @@ class TagDataSet(Dataset):
 
         if not di:
             di = load_dict()
-        self.ori_pos,self.ori_neg,self.keys,self.q_ext = load_pos_neg()
+        self.ori_pos,self.ori_neg,self.keys,self.q_ext,self.q_syn = load_pos_neg()
         # ori df 的header:
         self.ori_df = load_texts()
         

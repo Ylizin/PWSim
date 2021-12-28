@@ -238,7 +238,9 @@ def lem(sent):
     return list(filter(lambda x: len(x) > 1, lem_sent))
 
 
-def synonym_replacement(words, n):
+def synonym_replacement(words, n=None):
+    if n == None:
+        n = len(words)
     new_words = words.copy()
     random_word_list = list(set([word for word in words if word not in stop_words]))
     random.shuffle(random_word_list)
@@ -336,7 +338,9 @@ def swap_word(new_words):
 ########################################################################
 
 
-def random_insertion(words, n):
+def random_insertion(words, n=None):
+    if n == None:
+        n = len(words)
     new_words = words.copy()
     for _ in range(n):
         add_word(new_words)
@@ -366,7 +370,7 @@ def eda(sentence, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, p_rd=0.1, num_aug=9)
 
     sentence = get_only_chars(sentence)
     words = sentence.split(" ")
-    words = [word for word in words if word is not ""]
+    words = [word for word in words if word != ""]
     num_words = len(words)
 
     augmented_sentences = []

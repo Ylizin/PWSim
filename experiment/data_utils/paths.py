@@ -12,6 +12,8 @@ d2v_path = os.path.join(r'./data','d2v')
 pre_embedding_path = os.path.join(DATA_DIR,'pre_w2v.tar.gz')
 embedding_path = os.path.join(DATA_DIR,'w2v')
 pos_tag = os.path.join(DATA_DIR,'pos_tag2servs')
+ori2syn = os.path.join(DATA_DIR,'ori2syn')
+
 neg_tag = os.path.join(DATA_DIR,'neg_tag2servs')
 train_pairs = os.path.join(DATA_DIR,'train_pairs')
 test_pairs = os.path.join(DATA_DIR,'test_pairs')
