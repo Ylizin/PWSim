@@ -47,6 +47,8 @@ coun = pd.Series(c)
 # main_coun = coun[coun > 122]
 # sel_cats = set(main_coun.index)
 df['main_cat'] = df.Categories.apply(lambda x: parse_list(x)[0])
+most_pop_cat = set(main_cat.value_counts()[:20].index.tolist())
+df = df[df.main_cat.apply(lambda x:x in most_pop_cat)]
 
 
 cats = df.Categories.apply(parse_set)
@@ -65,6 +67,8 @@ from matplotlib import pyplot as plt
 plt.hist(tag_freq,bins=np.arange(0,1250,10))
 plt.xlim((0,1250))
 #%%
+
+
 des = df.loc[cats.index, 'Description']
 cat_len = cats.apply(lambda x: len(x))
 cats = cats[cat_len.apply(lambda x: 2 < x < 7)]
@@ -74,29 +78,32 @@ main_ids = df.main_cat.apply(lambda x: tag_di.token2id[x])
 cats_id = cats_id.apply(set)
 df = df.loc[cats.index]
 df['cats_id'] = cats_id
+
+
 #%%
-def find_common_tags(i, j, cats_id, tags):
+def find_common_tags(i, j, cats_id,main_cat_id, tags):
     # 找到所有满足要求的tags
     if len(cats_id.iloc[i]) < 3 or len(cats_id.iloc[j]) < 3:
         return
     common_ids = cats_id.iloc[i] & cats_id.iloc[j]
-    if len(common_ids) >= 3:
+    if (len(common_ids) >= 3) and  (main_cat_id in common_ids):
         tags.add(','.join(map(str, common_ids)))
 
 
-def mp_f(group_df):
+def mp_f(group_df,main_cat):
     tags = set()
     cats_id = group_df.cats_id
+    main_cat_id = tag_di.token2id[main_cat]
     for i in range(len(cats_id)):
         for j in range(i+1,len(cats_id)):
-            find_common_tags(i, j, cats_id, tags)
+            find_common_tags(i, j, cats_id,main_cat_id, tags)
     return tags
 
-
+print(len(df))
 tags = set()
 with ProcessPoolExecutor(max_workers=20) as exc:
-    for _,group_df in df.groupby('main_cat'):
-        exc.submit(mp_f,group_df).add_done_callback(
+    for main_cat,group_df in df.groupby('main_cat'):
+        exc.submit(mp_f,group_df,main_cat).add_done_callback(
             lambda x: tags.update(x.result()))
 # tag2servs = {query:{score:[]}}
 # 拿到和tags匹配的所有des
@@ -131,6 +138,7 @@ tag_di.id2token = {v: k for k, v in tag_di.token2id.items()}
 items = [(map(int, q.split(',')), v) for q, v in tag2servs.items()]
 # ave des len is 66 and ave q len is 3
 querys = [(list(tag_di.id2token[k] for k in m), v) for m, v in items]
+print([x[0] for x in querys])
 
 tag_di.add_documents([x[0] for x in querys])
 tag2servs = {','.join(map(str, tag_di.doc2idx(k))): [
