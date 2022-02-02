@@ -47,8 +47,7 @@ coun = pd.Series(c)
 # main_coun = coun[coun > 122]
 # sel_cats = set(main_coun.index)
 df['main_cat'] = df.Categories.apply(lambda x: parse_list(x)[0])
-most_pop_cat = set(main_cat.value_counts()[:20].index.tolist())
-df = df[df.main_cat.apply(lambda x:x in most_pop_cat)]
+
 
 
 cats = df.Categories.apply(parse_set)
@@ -61,6 +60,10 @@ tag_freq = pd.Series(list(tag_di.dfs.values()))
 # filter too frequent tags
 filtered_tags = set(tags[tag_freq < 400].tolist())
 cats = cats.apply(lambda x: x.intersection(filtered_tags))
+# take main cats
+most_pop_cat = set(main_cat.value_counts()[3:30].index.tolist())
+df = df[df.main_cat.apply(lambda x:x in most_pop_cat)]
+cats = df.Categories.apply(parse_set)
 #%%
 import numpy as np
 from matplotlib import pyplot as plt
