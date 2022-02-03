@@ -104,7 +104,7 @@ neg_tag2servs_tup = []
 for k,v in tag2servs_di.items():
     seen_doc = set(chain(*[s[0] for s in v]))
     unseen_servs = all_servs-seen_doc
-    neg_tag2servs_tup.append((k.replace(',',' '),np.random.choice(list(unseen_servs),size=10*len(v),replace = False),0))
+    neg_tag2servs_tup.append((k.replace(',',' '),np.random.choice(list(unseen_servs),size=2*len(v),replace = False),0))
 
 #%%
 d2idx = lambda x: ' '.join(map(str,di.doc2idx(x)))

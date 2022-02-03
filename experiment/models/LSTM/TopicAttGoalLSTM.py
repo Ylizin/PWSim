@@ -43,7 +43,7 @@ class LSTMModule(nn.Module):
     
     def forward(self,seq,bows,goals,vae_model=None):
         _,theta,loss,*_ = vae_model(bows)
-        goal_vec_li = [torch.mean(self.goalEmbedding(goal),0) for goal in goals]
+        goal_vec_li = [torch.max(self.goalEmbedding(goal),0) for goal in goals]
         goal_vec = torch.stack(goal_vec_li,dim=0)
         packed_seq,pad_idfs = self.pack_input_sequence(seq)
         pad_out,hn,cn = self.lstm(packed_seq)

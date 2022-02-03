@@ -92,7 +92,7 @@ class TagDataSet(Dataset):
 #         self.tag_df = self.ori_df.iloc[:,0].apply(d2i) # use enhanced 
         # 0 enhanced , 1 not enhanced
         # self.raw_ids = self.ori_df.iloc[:,0].apply(d2i)  
-        self.raw_ids = self.ori_df.iloc[:,4].str.cat(self.ori_df.iloc[:,5],sep = ' ').apply(d2i)  
+        self.raw_ids = self.ori_df.iloc[:,1].str.cat(self.ori_df.iloc[:,5],sep = ' ').apply(d2i)  
     
         # self.main_ids = self.ori_df.iloc[:,5].apply(lambda x:[(x,1)])
           
