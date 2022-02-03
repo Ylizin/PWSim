@@ -57,6 +57,9 @@ class WordEmbedding(nn.Module):
         if len(idx)==0:
             idx = torch.tensor([1])
         if self.cuda:
-            idx = idx.cuda()
+            if isinstance(idx,torch.Tensor) :
+                idx = idx.cuda()
+            elif isinstance(idx,(list,set,tuple)):
+                idx = [i.cuda() for i in idx ]
         # idf_v = self.sfm(self.idf(idx))
         return self.embedding(idx)#.mul(idf_v)
