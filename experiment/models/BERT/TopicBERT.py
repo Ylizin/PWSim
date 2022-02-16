@@ -8,7 +8,7 @@ from configs.BERTConfigs import args as _args
 from models.Embedding.Embedding import WordEmbedding
 from models.VAE.VAE import VAE,vae_loss
 
-class LSTMModule(nn.Module):
+class BERTModule(nn.Module):
     def __init__(self,suffix = '',args=_args):
         super().__init__()
 

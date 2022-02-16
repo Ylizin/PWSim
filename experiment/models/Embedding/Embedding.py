@@ -5,11 +5,13 @@ from configs.EmbeddingConfigs import args as _args
 import pickle
 
 class WordEmbedding(nn.Module):
-    def __init__(self,suffix = '',args=_args):
+    def __init__(self,suffix = '',args=_args,embedding_size=None):
         super().__init__()
         self.vocab_size = args.vocab_size
-        
-        self.embedding_dim = args.embedding_size
+        if not embedding_size:
+            self.embedding_dim = args.embedding_size
+        else:
+            self.embedding_dim = embedding_size
         self.pret_embeddings = args.pret_embeddings# + suffix 
         self.suffix = suffix
         self.idf_path = args.idf

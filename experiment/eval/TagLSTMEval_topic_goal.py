@@ -48,7 +48,10 @@ class LSTMEval(GeneralEval):
         
     def init_fe(self):
         self.feature_extractor = LSTMModule(suffix = str(self.train_test_id))
+        self.feature_extractor2 = LSTMModule(suffix = str(self.train_test_id))
+
         self.emb = self.feature_extractor.embedding
+        self.emb2 = self.feature_extractor.goalEmbedding
         self.sig = nn.Sigmoid()
         self.relu = nn.ReLU()
         
@@ -102,7 +105,8 @@ class LSTMEval(GeneralEval):
                 else:
                     ids = [torch.LongTensor(s) for s in id1]
                     # query 向量， 使用原始的tag作为query
-                    f1,_ = self.feature_extractor(ids,self.get_BoWs(self.query_ext(id1)),ids,self.vae)
+                    # f1,_ = self.feature_extractor(ids,self.get_BoWs(self.query_ext(id1)),ids,self.vae)
+                    f1 = torch.stack([torch.mean(self.emb2(torch.LongTensor(i)),dim = 0) for i in id1],dim=0).cuda()
                     
 #                 f1 = torch.stack([torch.mean(self.emb(torch.LongTensor(i)),dim = 0) for i in id1],dim=0).cuda()
                 f2,_ = self.feature_extractor(text2.tolist(),bows2.tolist(),goals,self.vae)
@@ -134,7 +138,7 @@ class LSTMEval(GeneralEval):
                 all_f.append(_f.cpu())
             all_f = torch.cat(all_f,dim = 0).view(len(self.data_set),-1)
             
-            topks = [1,5,10,15,20]
+            topks = [5,10,15,20]
             p,r,f,n = defaultdict(list),defaultdict(list),defaultdict(list),defaultdict(list)
             pred = {}
 
@@ -149,7 +153,8 @@ class LSTMEval(GeneralEval):
                     text1 = [torch.LongTensor(self.data_set.pos[test_k][0])]
 
                 pos_ids = list(self.data_set.pos[test_k][1])
-                test_f,wei = self.feature_extractor(text1,text_bow,text1,self.vae)
+                # test_f,wei = self.feature_extractor(text1,text_bow,text1,self.vae)
+                test_f = torch.stack([torch.mean(self.emb2(i),dim = 0) for i in text1],dim=0).cpu()
                 
 #                 test_f = torch.stack([torch.mean(self.emb(i),dim = 0) for i in text1],dim=0).cpu()
                 # test_f = torch.mean(torch.stack([self.feature_extractor(t[1].tolist()) for t in test_t.items()],dim=-1),dim=-1).cpu()
@@ -163,14 +168,22 @@ class LSTMEval(GeneralEval):
                     r[tk].append(_r)
                     f[tk].append(_f)
                     n[tk].append(_n)
-            p = {k:np.mean(v) for k,v in p.items()}
-            r = {k:np.mean(v) for k,v in r.items()}
-            f = {k:np.mean(v) for k,v in f.items()}
-            n = {k:np.mean(v) for k,v in n.items()}
-            table = {'p':p,'r':r,'f':f,'n':n}
-            print(table)
-            res[i]=pd.DataFrame(table).mean().T
+            # p = {k:np.mean(v) for k,v in p.items()}
+            # r = {k:np.mean(v) for k,v in r.items()}
+            # f = {k:np.mean(v) for k,v in f.items()}
+            # n = {k:np.mean(v) for k,v in n.items()}
+            table = {}
+            for k,v in p.items():
+                table.update({'p_'+str(k):v})
+            for k,v in r.items():
+                table.update({'r_'+str(k):v})
+            for k,v in f.items():
+                table.update({'f_'+str(k):v})
+            for k,v in n.items():
+                table.update({'n_'+str(k):v})
 
+            res[i]=pd.DataFrame(table).mean().T
+            print(res[i])
             #print('ave_pre:{}\tave_rec:{}'.format(np.mean(p),np.mean(r)))
             # pickle.dump(pred,open('./topic_pred','wb'))
             # pickle.dump(self.test_record,open('./true_{}'.format(i),'wb'))

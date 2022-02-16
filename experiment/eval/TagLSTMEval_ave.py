@@ -116,17 +116,21 @@ class LSTMEval(GeneralEval):
                     r[tk].append(_r)
                     f[tk].append(_f)
                     n[tk].append(_n)
-            p = {k:np.mean(v) for k,v in p.items()}
-            r = {k:np.mean(v) for k,v in r.items()}
-            f = {k:np.mean(v) for k,v in f.items()}
-            n = {k:np.mean(v) for k,v in n.items()}
-            table = {'p':p,'r':r,'f':f,'n':n}
-            print(table)
-            
+            table = {}
+            for k,v in p.items():
+                table.update({'p_'+str(k):v})
+            for k,v in r.items():
+                table.update({'r_'+str(k):v})
+            for k,v in f.items():
+                table.update({'f_'+str(k):v})
+            for k,v in n.items():
+                table.update({'n_'+str(k):v})
+
             res[i]=pd.DataFrame(table).mean().T
+            print(res[i])
             
             #print('ave_pre:{}\tave_rec:{}'.format(np.mean(p),np.mean(r)))
-            self.emb.save()
+            # self.emb.save()
             # pickle.dump(pred,open('./pred_{}'.format(i),'wb'))
             # pickle.dump(self.test_record,open('./true_{}'.format(i),'wb'))
             torch.autograd.set_grad_enabled(True)
