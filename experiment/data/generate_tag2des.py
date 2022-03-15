@@ -42,7 +42,7 @@ df = df[main_cat.apply(lambda x:x != '')]
 
 
 main_cat = main_cat[main_cat.apply(lambda x:x not in f_t)]
-c = Counter(main_cat.to_list())
+c = Counter(main_cat.tolist())
 coun = pd.Series(c)
 # main_coun = coun[coun > 122]
 # sel_cats = set(main_coun.index)
@@ -53,7 +53,7 @@ df['main_cat'] = df.Categories.apply(lambda x: parse_list(x)[0])
 cats = df.Categories.apply(parse_set)
 # cat_len = cats.apply(lambda x: len(x))
 # filter too much tags services
-tag_di = Dictionary(cats.to_list())
+tag_di = Dictionary(cats.tolist())
 tag_di.id2token = {v: k for k, v in tag_di.token2id.items()}
 tags = pd.Series(list(map(lambda x: tag_di.id2token[x], tag_di.dfs.keys())))
 tag_freq = pd.Series(list(tag_di.dfs.values()))

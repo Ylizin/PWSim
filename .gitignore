@@ -10,6 +10,8 @@ __pycache__/
 *.out
 *.so
 *.zip
+data2
+data3
 
 # Distribution / packaging
 .Python

@@ -12,13 +12,14 @@ from gensim.similarities import MatrixSimilarity
 import pickle
 
 class TFIDFEval(GeneralEval):
-    def __init__(self,args=_args):
-        super().__init__(True)
+    def __init__(self,args=_args,train_test_id=0):
+        super().__init__(True,train_test_id=train_test_id)
         self.args = args
         self.train_pairs = self.data_set.train_pairs    
         self.test_keys = self.data_set.test_keys
         self.df_idx = self.data_set.df_idx
         self.df = self.data_set.bow_df
+        self.model_str = "TFIDF"
 
         self.init_tfidf()
         
@@ -31,9 +32,10 @@ class TFIDFEval(GeneralEval):
 
 
     def train(self):
-        topks = [1,5,10,15,20,25,30]
+        topks = [5,10,15,20]
         p,r,f,n = defaultdict(list),defaultdict(list),defaultdict(list),defaultdict(list)
         pred = {}
+
         for test_k in range(len(self.data_set.pos)):
             query = self.data_set.filter_noise(list(Counter(self.data_set.pos[test_k][0]).items()))
             
@@ -47,9 +49,17 @@ class TFIDFEval(GeneralEval):
                     r[tk].append(_r)
                     f[tk].append(_f)
                     n[tk].append(_n)
-        p = {k:np.mean(v) for k,v in p.items()}
-        r = {k:np.mean(v) for k,v in r.items()}
-        f = {k:np.mean(v) for k,v in f.items()}
-        n = {k:np.mean(v) for k,v in n.items()}
-        table = {'p':p,'r':r,'f':f,'n':n}
-        print(pd.DataFrame(table).mean().T)
+            table = {}
+        for k,v in p.items():
+            table.update({'p_'+str(k):v})
+        for k,v in r.items():
+            table.update({'r_'+str(k):v})
+        for k,v in f.items():
+            table.update({'f_'+str(k):v})
+        for k,v in n.items():
+            table.update({'n_'+str(k):v})
+
+        res=pd.DataFrame(table).mean().T
+        print(res)
+        pd.DataFrame(res).T.to_csv('./out/'+self.model_str+str(self.train_test_id)+'.csv')
+        

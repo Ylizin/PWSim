@@ -11,14 +11,17 @@ import pickle
 import pandas as pd
 
 class CNNEval(GeneralEval):
-    def __init__(self,args=_args):
-        super().__init__()
+    def __init__(self,args=_args,train_test_id=0):
+        super().__init__(True,train_test_id=train_test_id)
         self.args = args
         self.cuda = args.cuda
         self.cos = nn.CosineSimilarity()
         self.train_pairs = self.data_set.train_pairs    
         self.test_keys = self.data_set.test_keys
         self.df_idx = self.data_set.df_idx
+        self.model_str = "TagCNNEval"
+        self.use_ext_query = args.use_ext_query
+        self.relu = nn.ReLU()
 
         self.init_fe()
         self.init_optim()
@@ -48,6 +51,8 @@ class CNNEval(GeneralEval):
         self.ids_loader = DataLoader(self.df_idx,batch_size = self.args.batch_size)
 
     def train(self):
+        res = {}
+
         for i in range(self.args.nepochs): #s
             epoch_loss = 0
             self.feature_extractor.train()
@@ -66,7 +71,7 @@ class CNNEval(GeneralEval):
                 # f2 = torch.mean(torch.stack([self.feature_extractor(t[1].tolist()) for t in text2.items()],dim=-1),dim=-1)
                 if self.cuda:
                     l = l.cuda()
-                p = self.cos(f1,f2)
+                p = self.relu(self.cos(f1,f2)) 
                 loss = self.loss(p,l)   
                 epoch_loss += loss.item()
                 self.optim.zero_grad()
@@ -85,7 +90,7 @@ class CNNEval(GeneralEval):
                 all_f.append(_f.cpu())
             all_f = torch.cat(all_f,dim = 0).view(len(self.data_set),-1)
             
-            topks = [1,5,10,15,20,25,30]
+            topks = [5,10,15,20]
             p,r,f,n = defaultdict(list),defaultdict(list),defaultdict(list),defaultdict(list)
             pred = {}
 
@@ -104,13 +109,20 @@ class CNNEval(GeneralEval):
                     r[tk].append(_r)
                     f[tk].append(_f)
                     n[tk].append(_n)
-            p = {k:np.mean(v) for k,v in p.items()}
-            r = {k:np.mean(v) for k,v in r.items()}
-            f = {k:np.mean(v) for k,v in f.items()}
-            n = {k:np.mean(v) for k,v in n.items()}
-            table = {'p':p,'r':r,'f':f,'n':n}
-            print(pd.DataFrame(table).T)
+            table = {}
+            for k,v in p.items():
+                table.update({'p_'+str(k):v})
+            for k,v in r.items():
+                table.update({'r_'+str(k):v})
+            for k,v in f.items():
+                table.update({'f_'+str(k):v})
+            for k,v in n.items():
+                table.update({'n_'+str(k):v})
+            res[i]=pd.DataFrame(table).mean().T
+            print(res[i])
             #print('ave_pre:{}\tave_rec:{}'.format(np.mean(p),np.mean(r)))
-            pickle.dump(pred,open('./lstm_pred','wb'))
+            # pickle.dump(pred,open('./lstm_pred','wb'))
             # pickle.dump(self.test_record,open('./true_{}'.format(i),'wb'))
             torch.autograd.set_grad_enabled(True)
+        pd.DataFrame(res).T.to_csv('./out/'+self.model_str+str(self.train_test_id)+'.csv')
+
