@@ -1,5 +1,6 @@
 #%%
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+from enum import auto
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
@@ -61,19 +62,25 @@ tag_freq = pd.Series(list(tag_di.dfs.values()))
 filtered_tags = set(tags[tag_freq < 400].tolist())
 cats = cats.apply(lambda x: x.intersection(filtered_tags))
 # take main cats
-most_pop_cat = set(main_cat.value_counts()[3:30].index.tolist())
-df = df[df.main_cat.apply(lambda x:x in most_pop_cat)]
+# most_pop_cat = set(main_cat.value_counts()[3:30].index.tolist())
+# df = df[df.main_cat.apply(lambda x:x in most_pop_cat)]
 cats = df.Categories.apply(parse_set)
 #%%
-import numpy as np
-from matplotlib import pyplot as plt
-plt.hist(tag_freq,bins=np.arange(0,1250,10))
-plt.xlim((0,1250))
+# import numpy as np
+# from matplotlib import pyplot as plt
+# plt.hist(tag_freq,bins=np.arange(0,1250,10))
+# plt.xlim((0,1250))
+# plt.savefig('tag_freq.svg')
 #%%
 
 
 des = df.loc[cats.index, 'Description']
 cat_len = cats.apply(lambda x: len(x))
+# plt.hist(cat_len,bins=np.arange(0,20,1))
+# plt.xlim((0,15))
+# plt.savefig("cat_len.svg")
+#%%
+
 cats = cats[cat_len.apply(lambda x: 2 < x < 7)]
 
 cats_id = cats.apply(tag_di.doc2idx)
@@ -81,7 +88,7 @@ main_ids = df.main_cat.apply(lambda x: tag_di.token2id[x])
 cats_id = cats_id.apply(set)
 df = df.loc[cats.index]
 df['cats_id'] = cats_id
-
+print(len(df))
 
 #%%
 def find_common_tags(i, j, cats_id,main_cat_id, tags):
@@ -102,7 +109,7 @@ def mp_f(group_df,main_cat):
             find_common_tags(i, j, cats_id,main_cat_id, tags)
     return tags
 
-print(len(df))
+
 tags = set()
 with ProcessPoolExecutor(max_workers=20) as exc:
     for main_cat,group_df in df.groupby('main_cat'):
