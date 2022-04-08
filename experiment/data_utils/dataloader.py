@@ -87,7 +87,7 @@ class TagDataSet(Dataset):
         d2i = lambda x: torch.tensor(self.filter_noise(self.di.doc2idx(x.strip().split())))
         # if BoW:
                                         # 1 for raw ,0 add chunks
-        self.bow_df = None #self.ori_df.iloc[:,1].apply(d2b)# use enhanced 
+        self.bow_df = self.ori_df.iloc[:,1].apply(d2b)# use enhanced 
         self.tag_ids = self.ori_df.iloc[:,3].apply(parse_list)
 #         self.tag_df = self.ori_df.iloc[:,0].apply(d2i) # use enhanced 
         # 0 enhanced , 1 not enhanced
@@ -98,7 +98,7 @@ class TagDataSet(Dataset):
           
                                                                 #2 for ext 0 for enrich
         # self.ext_df = self.ori_df.iloc[:,2].str.cat(self.ori_df.iloc[:,5],sep = ' ').apply(d2b)
-        self.ext_df = self.ori_df.iloc[:,2].apply(d2b)
+        self.ext_df = self.ori_df.iloc[:,1].apply(d2b)
 
         self.chunk_ids = self.ori_df.iloc[:,4].apply(d2i)
         self.goal_ids = self.ori_df.iloc[:,5].apply(d2i)

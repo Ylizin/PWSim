@@ -10,21 +10,21 @@ from models.WMD.WMD import cal_WMD
 import pickle
 
 class WMDEval(GeneralEval):
-    def __init__(self,args=_args):
+    def __init__(self,args=_args,train_test_id=0):
         super().__init__()
         self.args = args
         self.train_pairs = self.data_set.train_pairs    
         self.test_keys = self.data_set.test_keys
         self.df_idx = self.data_set.df_idx
-        self.df = self.data_set.tag_df
+        self.df = self.data_set.raw_ids
         self.di = self.data_set.di
+        self.model_str = "WMD"
 
     def train(self):
-        topks = [1,5,10,15,20,25,30]
+        topks = [5,10,15,20]
         p,r,f,n = defaultdict(list),defaultdict(list),defaultdict(list),defaultdict(list)
         pred = {}
         for test_k in self.test_keys:
-            print(test_k)
             query = list(map(lambda x:self.di.id2token[int(x)],self.data_set.pos[test_k][0]))
             sims = []
             for i in self.df_idx:
@@ -39,9 +39,16 @@ class WMDEval(GeneralEval):
                     r[tk].append(_r)
                     f[tk].append(_f)
                     n[tk].append(_n)
-        p = {k:np.mean(v) for k,v in p.items()}
-        r = {k:np.mean(v) for k,v in r.items()}
-        f = {k:np.mean(v) for k,v in f.items()}
-        n = {k:np.mean(v) for k,v in n.items()}
-        table = {'p':p,'r':r,'f':f,'n':n}
-        print(pd.DataFrame(table).T,flush = True)
+        table = {}
+        for k,v in p.items():
+            table.update({'p_'+str(k):v})
+        for k,v in r.items():
+            table.update({'r_'+str(k):v})
+        for k,v in f.items():
+            table.update({'f_'+str(k):v})
+        for k,v in n.items():
+            table.update({'n_'+str(k):v})
+
+        res=pd.DataFrame(table).mean().T
+        print(res)
+        pd.DataFrame(res).T.to_csv('./out/'+self.model_str+str(self.train_test_id)+'.csv')
