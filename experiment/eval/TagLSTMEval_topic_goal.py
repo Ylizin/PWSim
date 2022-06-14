@@ -33,7 +33,7 @@ class LSTMEval(GeneralEval):
         #   使用丰富后的内容作为query，相当于新的，更复杂的查询数据  
         self.use_ext_query = args.use_ext_query
 
-        self.model_str = "TagLSTMEval_topic_goal"
+        self.model_str = "topic_att_goal"
 
         self.init_loss()
         self.init_data_loader()

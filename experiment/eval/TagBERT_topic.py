@@ -28,7 +28,7 @@ class LSTMEval(GeneralEval):
         self.init_fe()
         self.use_ext_query = args.use_ext_query
 
-        self.model_str = "TagBertEval_topic"
+        self.model_str = "topic_bert"
 
         self.init_loss()
         self.init_data_loader()

@@ -9,6 +9,7 @@ test_args.add_argument("--hidden_size", type=int, default=384)
 test_args.add_argument("--input_size", type=int, default=384)
 test_args.add_argument("--topic_size", type=int, default=200)
 test_args.add_argument("--bidirectional", type=bool, default=True)
+test_args.add_argument("--goal_size", type=int, default=768)
 
 test_args.add_argument("-f", type=str, default='')
 

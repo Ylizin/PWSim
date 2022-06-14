@@ -62,8 +62,8 @@ tag_freq = pd.Series(list(tag_di.dfs.values()))
 filtered_tags = set(tags[tag_freq < 400].tolist())
 cats = cats.apply(lambda x: x.intersection(filtered_tags))
 # take main cats
-# most_pop_cat = set(main_cat.value_counts()[3:30].index.tolist())
-# df = df[df.main_cat.apply(lambda x:x in most_pop_cat)]
+most_pop_cat = set(main_cat.value_counts()[3:30].index.tolist())
+df = df[df.main_cat.apply(lambda x:x in most_pop_cat)]
 cats = df.Categories.apply(parse_set)
 #%%
 # import numpy as np

@@ -20,7 +20,7 @@ class LSTMEval(GeneralEval):
         self.test_keys = self.data_set.test_keys
         self.df_idx = self.data_set.df_idx
         
-        self.model_str = "TagLSTMEval"
+        self.model_str = "LSTM"
         self.use_ext_query = args.use_ext_query
 
         self.init_fe()

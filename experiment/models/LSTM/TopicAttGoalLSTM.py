@@ -22,7 +22,7 @@ class LSTMModule(nn.Module):
         # w for topic
         self.w = nn.Linear(self.topic_size, 2*self.hidden_size)
         # u for lstm_hidden out 
-        self.u = nn.Linear(2*self.hidden_size+self.topic_size+2*self.hidden_size,2*self.hidden_size)
+        self.u = nn.Linear(self.goal_size+2*self.hidden_size+self.topic_size,2*self.hidden_size)
         # g for goal 
         self.g = nn.Linear(self.goal_size,2*self.hidden_size)
         # v for last out 
